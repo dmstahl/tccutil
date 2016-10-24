@@ -48,7 +48,7 @@ def display_help(error_code=None):
   print "Usage:"
   print "  %s [--help | --version]" % (util_name)
   print "  sudo %s [--list] [--verbose]" % (util_name)
-  print "  sudo %s [--insert | --remove | --enable | --disable] <bundle_id | cli_path> [--verbose]" % (util_name)
+  print "  sudo %s [--insert | --remove | --enable | --disable] <bundle_id | cli_path> [--user <user>] [--verbose]" % (util_name)
   print ""
   print "Pass through reset command to built-in OS X utility:"
   print "  %s reset <Accessibility | AddressBook | Calendar | CoreLocationAgent | Facebook | Reminders | Twitter>" % (util_name)
@@ -61,6 +61,7 @@ def display_help(error_code=None):
   print "  -e | --enable    Enables Accessibility Access for the given Bundle ID or Path."
   print "  -d | --disable   Disables Accessibility Access for the given Bundle ID or Path."
   print "  -v | --verbose   Outputs additional info for some commands."
+  print "  -u | --user <user> Modified db for specified user."
   print "       --version   Prints the current version of this utility."
   if error_code != None: sys.exit(error_code)
 
@@ -75,7 +76,11 @@ def sudo_required():
 
 def open_database():
   #------------------------
-  sudo_required()
+  if user is None:
+      sudo_required()
+  else:
+      tcc_db = os.getenv("HOME") + tcc_db
+
   global conn
   global c
 
@@ -215,7 +220,7 @@ def main():
   try:
     # First arguments are UNIX-style, single-letter arguments. Those requiring arguments are followed by an :.
     # Second list are long options. Those requiring arguments are followed by an =.
-    opts, args = getopt.getopt(sys.argv[1:], "hlvi:r:e:d:", ['help', 'version', 'list', 'verbose', 'insert=', 'remove=', 'enable=', 'disable='])
+    opts, args = getopt.getopt(sys.argv[1:], "hlvi:r:e:d:u:", ['help', 'version', 'list', 'verbose', 'insert=', 'remove=', 'enable=', 'disable=', 'user='])
   except getopt.GetoptError as option_error:
       # If unknown options are specified, show help menu and exit.
     print "Error:"
